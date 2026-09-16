@@ -1,18 +1,17 @@
 # TradeForge
 
-TradeForge is an open-source algorithmic trading platform for strategy development, backtesting, paper trading, and multi-platform execution.
+TradeForge is an open-source algorithmic trading platform for strategy development, simulation, and multi-platform execution.
 
 ## Overview
 
-- Binance adapter support
-- MetaTrader 5 adapter support
-- Strategy SDK
-- Backtesting engine
-- Risk management layer
-- AI-assisted strategy tooling
-- Open-source core with premium extension paths
+- Binance integration
+- MetaTrader 5 adapters
+- Strategy backtesting and paper trading
+- Risk engine and execution guardrails
+- AI-assisted strategy generation and code testing
+- Open-source core with premium operational features
 
-## Getting started
+## Quick start
 
 ```bash
 docker compose up --build
