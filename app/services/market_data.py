@@ -2,26 +2,15 @@ from __future__ import annotations
 
 from typing import Any, Dict, List
 
+import ccxt
 
-class PaperTradingEngine:
-    def __init__(self) -> None:
-        self.history: List[Dict[str, Any]] = []
 
-    def simulate(self, payload: Dict[str, Any]) -> Dict[str, Any]:
-        strategy_name = payload.get("strategy_name", "MA Cross")
-        symbol = payload.get("symbol", "BTC/USDT")
-        entry_price = float(payload.get("entry_price", 100.0))
-        exit_price = float(payload.get("exit_price", 105.0))
-        pnl = (exit_price - entry_price) / entry_price * 100
+class MarketDataService:
+    def __init__(self, exchange_name: str = "binance") -> None:
+        if not hasattr(ccxt, exchange_name):
+            raise ValueError(f"Unsupported exchange: {exchange_name}")
+        self.exchange = getattr(ccxt, exchange_name)({"enableRateLimit": True})
 
-        trade = {
-            "strategy_name": strategy_name,
-            "symbol": symbol,
-            "side": "long",
-            "entry_price": entry_price,
-            "exit_price": exit_price,
-            "pnl_pct": round(pnl, 2),
-            "status": "closed",
-        }
-        self.history.append(trade)
-        return trade
+    def fetch_ohlcv(self, symbol: str, timeframe: str = "1h", limit: int = 100) -> List[Dict[str, Any]]:
+        candles = self.exchange.fetch_ohlcv(symbol, timeframe=timeframe, limit=limit)
+        return [{"timestamp": c[0], "open": float(c[1]), "high": float(c[2]), "low": float(c[3]), "close": float(c[4]), "volume": float(c[5])} for c in candles]

@@ -1,47 +1,21 @@
-from dataclasses import dataclass
+from __future__ import annotations
+
+from typing import Any, Dict, List
 
 
-@dataclass
-class RiskCheck:
-    allowed: bool
-    reason: str = ""
-    suggested_position_size: float = 0.0
+class PaperTradingEngine:
+    def __init__(self) -> None:
+        self.history: List[Dict[str, Any]] = []
 
-
-class RiskEngine:
-    def __init__(self, *, max_position_size: float = 0.1, max_daily_loss: float = 0.02, max_open_positions: int = 3):
-        self.max_position_size = max_position_size
-        self.max_daily_loss = max_daily_loss
-        self.max_open_positions = max_open_positions
-
-    def evaluate_trade(self, *, capital: float, notional_size: float, open_positions: int, current_drawdown: float = 0.0) -> RiskCheck:
-        max_trade_size = capital * self.max_position_size
-        if notional_size > max_trade_size:
-            return RiskCheck(
-                allowed=False,
-                reason=f"Trade size exceeds max allowed position size ({max_trade_size:.2f}).",
-                suggested_position_size=max_trade_size,
-            )
-
-        if current_drawdown >= self.max_daily_loss:
-            return RiskCheck(
-                allowed=False,
-                reason=f"Portfolio drawdown exceeds daily loss limit ({self.max_daily_loss * 100:.2f}%).",
-                suggested_position_size=0.0,
-            )
-
-        if open_positions >= self.max_open_positions:
-            return RiskCheck(
-                allowed=False,
-                reason=f"Open positions limit reached ({self.max_open_positions}).",
-                suggested_position_size=0.0,
-            )
-
-        return RiskCheck(
-            allowed=True,
-            reason="Trade passes risk limits.",
-            suggested_position_size=min(notional_size, max_trade_size),
-        )
-
-    def position_size_for_equity(self, equity: float, risk_percent: float = 0.01) -> float:
-        return equity * risk_percent
+    def simulate(self, payload: Dict[str, Any]) -> Dict[str, Any]:
+        entry = float(payload.get("entry_price", 0))
+        exit_price = float(payload.get("exit_price", 0))
+        if entry <= 0 or exit_price <= 0:
+            raise ValueError("entry_price and exit_price must be positive")
+        side = payload.get("side", "long").lower()
+        if side not in {"long", "short"}:
+            raise ValueError("side must be long or short")
+        pnl_pct = ((exit_price - entry) / entry if side == "long" else (entry - exit_price) / entry) * 100
+        trade = {"strategy_name": payload.get("strategy_name", "manual"), "symbol": payload.get("symbol", "BTC/USDT"), "side": side, "entry_price": entry, "exit_price": exit_price, "pnl_pct": round(pnl_pct, 4), "status": "closed"}
+        self.history.append(trade)
+        return trade
