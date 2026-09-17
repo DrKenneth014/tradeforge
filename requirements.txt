@@ -1,10 +1,67 @@
-fastapi==0.115.0
-uvicorn==0.30.6
-pydantic==2.9.2
-pydantic-settings==2.5.2
-python-dotenv==1.0.1
-pytest==8.3.2
-httpx==0.27.2
-numpy==2.1.2
-pandas==2.2.3
-ccxt==4.4.36
+# TradeForge
+
+TradeForge is an open-source algorithmic trading platform scaffold focused on strategy design, market-data access, backtesting, paper trading, and risk-aware execution.
+
+## Overview
+
+- Binance-compatible market data access
+- strategy management and persistence
+- historical backtesting engine
+- paper-trading simulation layer
+- risk controls and execution guardrails
+- FastAPI backend foundation
+
+## Stack
+
+- Python 3.11+
+- FastAPI
+- SQLAlchemy / SQLite
+- Pandas / NumPy
+- CCXT
+- pytest
+
+## Local quick start
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+uvicorn app.main:app --reload
+```
+
+Windows PowerShell:
+
+```powershell
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+uvicorn app.main:app --reload
+```
+
+## Available endpoints
+
+- GET /health
+- GET /strategies
+- POST /strategies
+- GET /strategies/{strategy_id}
+- POST /backtest
+- GET /paper-trades
+- POST /paper-trades/simulate
+
+## Current MVP scope
+
+This repo now supports:
+
+- storing strategies in SQLite
+- running SMA-based backtests
+- applying risk checks before trade execution
+- simulating paper-trading records locally
+- preparing the app for Binance / MT5 integration
+
+## Next phases
+
+- live Binance integration
+- MetaTrader 5 adapters
+- dashboard UI
+- AI-assisted strategy review
+- real-time monitoring

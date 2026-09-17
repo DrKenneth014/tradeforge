@@ -1,26 +1,21 @@
-from app.services.backtester import Backtester
+from app.services.risk_engine import RiskEngine
 
 
-def test_backtester_produces_metrics_for_sample_candles():
-    candles = [
-        {"close": 100.0},
-        {"close": 101.0},
-        {"close": 102.0},
-        {"close": 101.0},
-        {"close": 103.0},
-        {"close": 104.0},
-        {"close": 103.0},
-        {"close": 105.0},
-        {"close": 106.0},
-        {"close": 107.0},
-        {"close": 108.0},
-        {"close": 110.0},
-    ]
+def test_risk_engine_allows_standard_trade():
+    engine = RiskEngine(max_position_size=0.10, max_daily_loss=0.05, max_open_positions=3)
+    result = engine.evaluate_trade(capital=10000, notional_size=500, open_positions=1)
+    assert result.allowed is True
+    assert result.suggested_position_size == 500
 
-    backtester = Backtester(initial_capital=10000)
-    result = backtester.run(candles, fast_period=2, slow_period=3)
 
-    assert result.trades >= 0
-    assert isinstance(result.total_return_pct, float)
-    assert isinstance(result.max_drawdown_pct, float)
-    assert result.equity_curve
+def test_risk_engine_blocks_large_trade():
+    engine = RiskEngine(max_position_size=0.10, max_daily_loss=0.05, max_open_positions=3)
+    result = engine.evaluate_trade(capital=10000, notional_size=1500, open_positions=1)
+    assert result.allowed is False
+    assert result.suggested_position_size == 1000
+
+
+def test_risk_engine_blocks_max_open_positions():
+    engine = RiskEngine(max_position_size=0.10, max_daily_loss=0.05, max_open_positions=2)
+    result = engine.evaluate_trade(capital=10000, notional_size=500, open_positions=2)
+    assert result.allowed is False

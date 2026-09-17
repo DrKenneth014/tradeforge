@@ -1,23 +1,11 @@
-import pytest
-
-from app.services.risk_engine import RiskEngine
-
-
-def test_risk_engine_allows_standard_trade():
-    engine = RiskEngine(max_position_size=0.10, max_daily_loss=0.05, max_open_positions=3)
-    result = engine.evaluate_trade(capital=10000, notional_size=500, open_positions=1)
-    assert result.allowed is True
-    assert result.suggested_position_size == 500
-
-
-def test_risk_engine_blocks_large_trade():
-    engine = RiskEngine(max_position_size=0.10, max_daily_loss=0.05, max_open_positions=3)
-    result = engine.evaluate_trade(capital=10000, notional_size=1500, open_positions=1)
-    assert result.allowed is False
-    assert result.suggested_position_size == 1000
-
-
-def test_risk_engine_blocks_max_open_positions():
-    engine = RiskEngine(max_position_size=0.10, max_daily_loss=0.05, max_open_positions=2)
-    result = engine.evaluate_trade(capital=10000, notional_size=500, open_positions=2)
-    assert result.allowed is False
+fastapi==0.115.0
+uvicorn==0.30.6
+pydantic==2.9.2
+pydantic-settings==2.5.2
+python-dotenv==1.0.1
+pytest==8.3.2
+httpx==0.27.2
+numpy==2.1.2
+pandas==2.2.3
+ccxt==4.4.36
+SQLAlchemy==2.0.35

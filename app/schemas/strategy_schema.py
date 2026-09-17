@@ -13,7 +13,6 @@ class StrategyCreate(BaseModel):
     fast_period: int = Field(default=5, ge=2)
     slow_period: int = Field(default=10, ge=2)
     enabled: bool = True
-    parameters: dict = {}
 
 
 class StrategyResponse(StrategyCreate):
